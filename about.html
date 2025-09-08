@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حول SUBUTSMP </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a40 25%, #2d2d5f 50%, #1a1a40 75%, #0f0f23 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #0f0f23, #1a1a40, #2d2d5f, #4a4a8a);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(74, 74, 138, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(15, 15, 35, 0.98);
+            box-shadow: 0 4px 30px rgba(74, 74, 138, 0.2);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: clamp(1rem, 2vw, 2rem) clamp(1rem, 5vw, 3rem);
+            position: relative;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: bold;
+            background: linear-gradient(45deg, #4a90e2, #7b68ee, #9370db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(74, 144, 226, 0.5);
+            animation: logoGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.3); }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: clamp(0.5rem, 2vw, 1.5rem);
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: clamp(0.75rem, 1.5vw, 1rem);
+            transition: all 0.3s ease;
+            position: relative;
+            padding: clamp(0.3rem, 1vw, 0.6rem) clamp(0.5rem, 1.5vw, 1rem);
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+            color: #4a90e2;
+            background: rgba(74, 144, 226, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, #4a90e2, #7b68ee);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover::after {
+            width: 80%;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .mobile-menu span {
+            width: 25px;
+            height: 3px;
+            background: #ffffff;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .mobile-menu.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .mobile-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .mobile-nav {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 15, 35, 0.98);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(74, 74, 138, 0.3);
+            padding: 1rem;
+        }
+
+        .mobile-nav.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mobile-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .mobile-nav li {
+            margin: 0.5rem 0;
+        }
+
+        .mobile-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: block;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav a:hover {
+            background: rgba(74, 144, 226, 0.2);
+            color: #4a90e2;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: clamp(4rem, 10vw, 6rem);
+            padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 5vw, 3rem);
+        }
+
+        /* Page Title */
+        .page-title {
+            text-align: center;
+            margin-bottom: clamp(3rem, 6vw, 5rem);
+        }
+
+        .page-title h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            background: linear-gradient(45deg, #4a90e2, #7b68ee, #9370db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.2); }
+        }
+
+        .page-title p {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Content Sections */
+        .content-section {
+            max-width: 1200px;
+            margin: 0 auto clamp(3rem, 6vw, 5rem) auto;
+        }
+
+        .section-card {
+            background: rgba(26, 26, 64, 0.4);
+            border-radius: 20px;
+            padding: clamp(2rem, 5vw, 3rem);
+            margin-bottom: clamp(2rem, 4vw, 3rem);
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(74, 144, 226, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(74, 144, 226, 0.6);
+            box-shadow: 0 15px 35px rgba(74, 144, 226, 0.3);
+        }
+
+        .section-card:hover::before {
+            opacity: 1;
+        }
+
+        .section-card h2 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            background: linear-gradient(45deg, #4a90e2, #7b68ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: clamp(1.5rem, 3vw, 2rem);
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-card p {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-card:last-child p {
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(15, 15, 35, 0.8);
+            padding: clamp(2rem, 5vw, 3rem);
+            border-top: 1px solid rgba(74, 144, 226, 0.3);
+            margin-top: clamp(3rem, 8vw, 5rem);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: clamp(2rem, 5vw, 3rem);
+            margin-bottom: clamp(1.5rem, 3vw, 2rem);
+        }
+
+        .social-link {
+            position: relative;
+            display: inline-block;
+            padding: clamp(1rem, 2vw, 1.5rem);
+            background: rgba(26, 26, 64, 0.6);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 15px 30px rgba(74, 144, 226, 0.4);
+            border-color: rgba(74, 144, 226, 0.6);
+        }
+
+        .social-icon {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            display: block;
+            background: linear-gradient(45deg, #4a90e2, #7b68ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .social-tooltip {
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 35, 0.9);
+            color: #ffffff;
+            padding: clamp(0.4rem, 1vw, 0.6rem) clamp(0.8rem, 2vw, 1.2rem);
+            border-radius: 8px;
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .social-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid rgba(15, 15, 35, 0.9);
+        }
+
+        .social-link:hover .social-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: clamp(1rem, 2vw, 1.5rem);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav {
+                justify-content: center;
+                position: relative;
+            }
+            
+            .logo {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: flex;
+                position: absolute;
+                right: clamp(1rem, 5vw, 3rem);
+            }
+            
+            .social-links {
+                gap: clamp(1rem, 3vw, 2rem);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .social-links {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+        }
+
+        /* Floating Elements */
+        .floating-cube {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, rgba(74, 144, 226, 0.3), rgba(123, 104, 238, 0.3));
+            animation: float 6s ease-in-out infinite;
+            border-radius: 3px;
+        }
+
+        .floating-cube:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-cube:nth-child(2) {
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .floating-cube:nth-child(3) {
+            bottom: 30%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+
+    <!-- Floating Elements -->
+    <div class="floating-cube"></div>
+    <div class="floating-cube"></div>
+    <div class="floating-cube"></div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav">
+            <div class="logo">SUBUTSMP</div>
+            <ul class="nav-links">
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="join.html#rules-section">القوانين</a></li>
+                                <li><a href="join.html#scommands-section">الأوامر</a></li>
+                <li><a href="join.html#support-section">الإدارة</a></li>
+                <li><a href="contact.html">التواصل</a></li>
+                        <li><a href="about.html">حول السيرفر</a></li>
+            </ul>
+            <div class="mobile-menu" id="mobileMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+        <div class="mobile-nav" id="mobileNav">
+            <ul>
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="join.html#rules-section">القوانين</a></li>
+                                <li><a href="join.html#scommands-section">الأوامر</a></li>
+                <li><a href="join.html#support-section">الإدارة</a></li>
+                <li><a href="contact.html">التواصل</a></li>
+                        <li><a href="about.html">حول السيرفر</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Title -->
+        <section class="page-title">
+            <h1>حول SUBUTSMP</h1>
+            <p>تعرف على قصة السيرفر ورؤيتنا في تقديم أفضل تجربة لعب في عالم ماين كرافت العربي</p>
+        </section>
+
+        <!-- Content Sections -->
+        <div class="content-section">
+            <!-- About Server -->
+            <div class="section-card">
+                <h2>🎮 قصة السيرفر</h2>
+                <p>
+                    بدأ SUBUTSMP كحلم بسيط - إنشاء مجتمع عربي قوي ومترابط في عالم ماين كرافت. منذ انطلاقنا، 
+                    كان هدفنا الأساسي هو توفير بيئة آمنة وممتعة للاعبين العرب من جميع الأعمار.
+                </p>
+                <p>
+                    نؤمن بأن اللعب الجماعي يخلق ذكريات لا تُنسى، ولهذا نركز على بناء علاقات حقيقية بين 
+                    أعضاء مجتمعنا. كل لاعب في SUBUTSMP ليس مجرد رقم، بل جزء مهم من عائلتنا الكبيرة.
+                </p>
+                <p>
+                    السيرفر يضم عشرات اللاعبين النشطين الذين يتنافسون فيما بينهم لمن هوة افضل لاعب وايضا
+                    نعمل باستمرار على تطوير وتحسين السيرفر لنضمن لك أفضل تجربة لعب ممكنة.
+                </p>
+            </div>
+
+            <!-- Mission & Vision -->
+            <div class="section-card">
+                <h2>🎯 رؤيتنا ورسالتنا</h2>
+                <p>
+                    <strong>رؤيتنا:</strong> أن نكون السيرفر العربي الأول والأكثر تميزاً في عالم ماين كرافت، 
+                    حيث يجتمع اللاعبون لبناء عوالم مذهلة وذكريات لا تُنسى.
+                </p>
+                <p>
+                    <strong>رسالتنا:</strong> نسعى لتوفير بيئة لعب آمنة ومحفزة للإبداع، حيث يمكن لكل لاعب 
+                    التعبير عن نفسه وبناء أحلامه الرقمية مع أصدقاء حقيقيين من جميع أنحاء الوطن العربي.
+                </p>
+            </div>
+
+            <!-- Values -->
+            <div class="section-card">
+                <h2>💎 قيمنا الأساسية</h2>
+                <p>
+                    <strong>الاحترام المتبادل:</strong> نؤمن بأهمية احترام جميع اللاعبين بغض النظر عن 
+                    أعمارهم أو خلفياتهم، ونعمل على خلق بيئة ودية ومرحبة للجميع.
+                </p>
+                <p>
+                    <strong>الإبداع والابتكار:</strong> نشجع اللاعبين على التفكير خارج الصندوق وبناء 
+                    إبداعات مذهلة، ونوفر الأدوات والموارد اللازمة لتحقيق رؤاهم.
+                </p>
+                <p>
+                    <strong>العدالة والشفافية:</strong> نطبق القوانين بعدالة على جميع اللاعبين دون 
+                    استثناء، ونتواصل بشفافية حول جميع القرارات والتحديثات.
+                </p>
+                <p>
+                    <strong>المجتمع والتعاون:</strong> نؤمن بقوة العمل الجماعي ونشجع التعاون بين 
+                    اللاعبين لبناء مشاريع ضخمة وإنجازات مشتركة.
+                </p>
+            </div>
+
+            <!-- What Makes Us Special -->
+            <div class="section-card">
+                <h2>⭐ ما يميزنا</h2>
+                <p>
+                    <strong>التقنية المتقدمة:</strong> نستخدم أحدث التقنيات لضمان أداء مثالي وتجربة لعب سلسة 
+                    بدون انقطاع أو تأخير، مع دعم كامل لإصداري Java و Bedrock.
+                </p>
+                <p>
+                    <strong>المحتوى المميز:</strong> نقدم فعاليات أسبوعية مثيرة، مسابقات إبداعية، وتحديات 
+                    ممتعة تجعل كل يوم في السيرفر مليئاً بالمفاجآت والإثارة.
+                </p>
+                <p>
+                    <strong>الأمان والحماية:</strong> نضمن بيئة آمنة خالية من المضايقات والغش، مع فريق إدارة 
+                    متفان يعمل على مدار الساعة لحماية مجتمعنا.
+                </p>
+                <p>
+                    <strong>المرونة والتطوير:</strong> نستمع لآراء مجتمعنا ونطور السيرفر باستمرار بناءً على 
+                    اقتراحاتكم وملاحظاتكم لنضمن أننا نلبي توقعاتكم دائماً.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="https://discord.gg/subutsmp" target="_blank" class="social-link">
+                    <span class="social-icon">💬</span>
+                    <div class="social-tooltip">Discord</div>
+                </a>
+                <a href="https://tiktok.com/@subutsmp" target="_blank" class="social-link">
+                    <span class="social-icon">🎵</span>
+                    <div class="social-tooltip">TikTok</div>
+                </a>
+            </div>
+            <div class="footer-text">
+                &copy; 2025 SUBUTSMP. جميع الحقوق محفوظة 
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Header Scroll Effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileNav = document.getElementById('mobileNav');
+
+        mobileMenu.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!mobileMenu.contains(event.target) && !mobileNav.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+
+        // Parallax Effect for Floating Cubes
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const cubes = document.querySelectorAll('.floating-cube');
+            
+            cubes.forEach((cube, index) => {
+                const speed = 0.1 + (index * 0.05);
+                cube.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+
+        // Smooth Scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Close mobile menu after clicking
+                    mobileMenu.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                }
+            });
+        });
+
+        // Page Load Animation
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.section-card').forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.animation = 'fadeInUp 0.6s ease forwards';
+                }, index * 200);
+            });
+        });
+
+        // Add fadeInUp animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
